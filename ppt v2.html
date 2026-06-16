@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>连接，而不是构建到 AI · Hippie Keynote</title>
+<style>
+  :root{
+    --bg:#0c0b10;
+    --paper:#15131b;
+    --ink:#f4f0ea;
+    --muted:#b4acbf;
+    --red:#ff7a6d;
+    --pink:#ff96b8;
+    --orange:#ffbf58;
+    --yellow:#f2d96b;
+    --green:#84d89b;
+    --teal:#6fd6d0;
+    --blue:#81a9ff;
+    --violet:#b193ff;
+    --line:#f2eee7;
+    --shadow:0 30px 80px rgba(0,0,0,.38);
+    --radius:28px;
+    --font:'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+  body{
+    background:
+      radial-gradient(circle at 8% 10%, rgba(255,191,88,.10), transparent 18%),
+      radial-gradient(circle at 90% 16%, rgba(111,214,208,.10), transparent 20%),
+      radial-gradient(circle at 82% 82%, rgba(255,150,184,.10), transparent 19%),
+      radial-gradient(circle at 18% 86%, rgba(129,169,255,.08), transparent 18%),
+      linear-gradient(180deg,#121018 0%, #0c0b10 100%);
+  }
+  body:before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.08;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23f2eee7' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M20 20c8 0 8-10 16-10s8 10 16 10 8-10 16-10 8 10 16 10'/%3E%3Cpath d='M20 60c8 0 8-10 16-10s8 10 16 10 8-10 16-10 8 10 16 10'/%3E%3Cpath d='M20 100c8 0 8-10 16-10s8 10 16 10 8-10 16-10 8 10 16 10'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  #deck{position:relative;width:100vw;height:100vh;display:grid;place-items:center}
+  .slide{position:absolute;display:none;width:min(100vw,177.78vh);height:min(56.25vw,100vh);aspect-ratio:16/9;padding:5.4% 6%;overflow:hidden;background:rgba(21,19,27,.74);backdrop-filter:blur(4px);box-shadow:var(--shadow)}
+  .slide.active{display:block;animation:slideIn .55s cubic-bezier(.22,.78,.2,1) both}
+  @keyframes slideIn{from{opacity:0;transform:translateY(18px) scale(.988)}to{opacity:1;transform:none}}
+  .slide:after{content:"";position:absolute;inset:2.2%;border:1.5px solid rgba(242,238,231,.12);border-radius:34px;pointer-events:none}
+
+  .ambient{position:absolute;inset:0;pointer-events:none}
+  .blob{position:absolute;border-radius:46% 54% 59% 41% / 42% 47% 53% 58%;opacity:.92;filter:saturate(104%)}
+  .b1{width:18vw;height:15vw;left:-2vw;top:3vw;background:rgba(245,107,94,.18);animation:float 7s ease-in-out infinite}
+  .b2{width:12vw;height:10vw;right:4vw;top:8vw;background:rgba(111,214,208,.12);animation:float 6s ease-in-out infinite reverse}
+  .b3{width:20vw;height:17vw;right:-5vw;bottom:-2vw;background:rgba(177,147,255,.10);animation:float 8s ease-in-out infinite}
+  .b4{width:11vw;height:9vw;left:8vw;bottom:6vw;background:rgba(255,191,88,.12);animation:float 5.5s ease-in-out infinite reverse}
+  @keyframes float{50%{transform:translateY(-.8vw) translateX(.6vw) rotate(2deg)}}
+
+  .kicker{font-size:1vw;letter-spacing:.3em;text-transform:uppercase;color:#d4ccdc;font-weight:700}
+  .title{font-size:5.5vw;line-height:.97;letter-spacing:-.08em;font-weight:780;margin:0;position:relative;z-index:2}
+  .title.big{font-size:6.4vw}
+  .h2{font-size:4.15vw;line-height:1;letter-spacing:-.07em;font-weight:760;margin:0;position:relative;z-index:2}
+  .lead{font-size:1.25vw;line-height:1.65;color:var(--muted);max-width:56vw;margin-top:1.45vw;position:relative;z-index:2}
+  .center{height:100%;display:grid;place-items:center;text-align:center}
+  .hero{height:100%;display:grid;align-content:center;position:relative}
+  .split{height:100%;display:grid;grid-template-columns:1.02fr .98fr;gap:3.8vw;align-items:center;position:relative;z-index:2}
+  .stack{display:flex;flex-direction:column;gap:1vw}
+  .grad{background:linear-gradient(90deg,var(--red),var(--orange),var(--teal),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tagline{margin-top:1.7vw;font-size:.92vw;letter-spacing:.18em;text-transform:uppercase;color:rgba(242,238,231,.55)}
+
+  .reveal{opacity:0;transform:translateY(12px);animation:rise .55s cubic-bezier(.2,.8,.2,1) forwards}
+  .d1{animation-delay:.08s}.d2{animation-delay:.24s}.d3{animation-delay:.40s}.d4{animation-delay:.56s}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  @keyframes popIn{0%{opacity:0;transform:scale(.86)}70%{opacity:1;transform:scale(1.03)}100%{opacity:1;transform:scale(1)}}
+  @keyframes tiltIn{0%{opacity:0;transform:translateY(16px) rotate(-2deg)}100%{opacity:1;transform:none}}
+  @keyframes drawLine{to{stroke-dashoffset:0}}
+  @keyframes glowPulse{0%,100%{box-shadow:0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 0 8px rgba(255,255,255,.03)}}
+  @keyframes cardLift{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}
+  @keyframes stampIn{0%{opacity:0;transform:scale(.8) rotate(-4deg)}75%{opacity:1;transform:scale(1.04) rotate(1deg)}100%{opacity:1;transform:none}}
+  @keyframes shimmerBorder{0%,100%{border-color:rgba(255,255,255,.10)}50%{border-color:rgba(255,191,88,.35)}}
+  @keyframes expandLine{0%{transform:scaleX(.2);opacity:0}100%{transform:scaleX(1);opacity:1}}
+
+  /* Slide-specific animation language */
+  .slide:nth-of-type(3).active .flow-svg path{stroke-dasharray:520;stroke-dashoffset:520;animation:drawLine .75s ease-out forwards}
+  .slide:nth-of-type(3).active .flow-svg path:nth-child(1){animation-delay:.08s}
+  .slide:nth-of-type(3).active .flow-svg path:nth-child(2){animation-delay:.16s}
+  .slide:nth-of-type(3).active .flow-svg path:nth-child(3){animation-delay:.24s}
+  .slide:nth-of-type(3).active .flow-svg path:nth-child(4){animation-delay:.32s}
+  @keyframes popInCore{0%{opacity:0;transform:translate(-50%,-50%) scale(.86)}70%{opacity:1;transform:translate(-50%,-50%) scale(1.03)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  .slide:nth-of-type(3).active .node{opacity:0;animation:popIn .42s ease-out forwards}
+  .slide:nth-of-type(3).active .core{animation:popInCore .42s ease-out forwards;animation-delay:.08s}
+  .slide:nth-of-type(3).active .n1{animation-delay:.24s}
+  .slide:nth-of-type(3).active .n2{animation-delay:.32s}
+  .slide:nth-of-type(3).active .n3{animation-delay:.40s}
+  .slide:nth-of-type(3).active .n4{animation-delay:.48s}
+
+  .slide:nth-of-type(4).active .bubble-word{opacity:0;animation:stampIn .45s ease-out forwards}
+  .slide:nth-of-type(4).active .bubble-word:nth-child(1){animation-delay:.24s}
+  .slide:nth-of-type(4).active .bubble-word:nth-child(2){animation-delay:.36s}
+
+  .slide:nth-of-type(5).active .card{opacity:0;animation:cardLift .5s ease-out forwards}
+  .slide:nth-of-type(5).active .card:nth-child(1){animation-delay:.18s}
+  .slide:nth-of-type(5).active .card:nth-child(2){animation-delay:.30s}
+  .slide:nth-of-type(5).active .card:nth-child(3){animation-delay:.42s}
+
+  .slide:nth-of-type(6).active .illustration{opacity:0;animation:tiltIn .55s ease-out .18s forwards}
+  .slide:nth-of-type(6).active .illustration svg rect{animation:glowPulse 1.6s ease-in-out .55s 1}
+
+  .slide:nth-of-type(7).active .tri-line{transform-origin:center;animation:expandLine .45s ease-out forwards}
+  .slide:nth-of-type(7).active .tl1{animation-delay:.1s}.slide:nth-of-type(7).active .tl2{animation-delay:.18s}.slide:nth-of-type(7).active .tl3{animation-delay:.26s}
+  .slide:nth-of-type(7).active .tri-node{opacity:0;animation:popIn .42s ease-out forwards}
+  .slide:nth-of-type(7).active .t1{animation-delay:.22s}.slide:nth-of-type(7).active .t2{animation-delay:.32s}.slide:nth-of-type(7).active .t3{animation-delay:.42s}
+
+  .slide:nth-of-type(8).active .cell{opacity:0;animation:cardLift .45s ease-out forwards}
+  .slide:nth-of-type(8).active .cell:nth-child(1){animation-delay:.15s}
+  .slide:nth-of-type(8).active .cell:nth-child(2){animation-delay:.25s}
+  .slide:nth-of-type(8).active .cell:nth-child(3){animation-delay:.35s;animation-name:cardLift, shimmerBorder;animation-duration:.45s, 1.2s;animation-delay:.35s, .95s;animation-fill-mode:forwards, both}
+  .slide:nth-of-type(8).active .cell:nth-child(4){animation-delay:.45s}
+
+  .slide:nth-of-type(9).active .step{opacity:0;animation:tiltIn .45s ease-out forwards}
+  .slide:nth-of-type(9).active .step:nth-child(1){animation-delay:.18s}
+  .slide:nth-of-type(9).active .step:nth-child(2){animation-delay:.30s}
+  .slide:nth-of-type(9).active .step:nth-child(3){animation-delay:.42s}
+
+  .slide:nth-of-type(10).active .card{opacity:0;animation:cardLift .45s ease-out forwards}
+  .slide:nth-of-type(10).active .card:nth-child(1){animation-delay:.14s}
+  .slide:nth-of-type(10).active .card:nth-child(2){animation-delay:.24s}
+  .slide:nth-of-type(10).active .card:nth-child(3){animation-delay:.34s}
+  .slide:nth-of-type(10).active .card:nth-child(4){animation-delay:.44s}
+
+  .slide:nth-of-type(11).active .step{opacity:0;animation:tiltIn .42s ease-out forwards}
+  .slide:nth-of-type(11).active .step:nth-child(1){animation-delay:.12s}
+  .slide:nth-of-type(11).active .step:nth-child(2){animation-delay:.22s}
+  .slide:nth-of-type(11).active .step:nth-child(3){animation-delay:.32s}
+  .slide:nth-of-type(11).active .step:nth-child(4){animation-delay:.42s}
+
+  .slide:nth-of-type(12).active .risk{opacity:0;animation:cardLift .45s ease-out forwards}
+  .slide:nth-of-type(12).active .risk:nth-child(1){animation-delay:.14s}
+  .slide:nth-of-type(12).active .risk:nth-child(2){animation-delay:.24s}
+  .slide:nth-of-type(12).active .risk:nth-child(3){animation-delay:.34s}
+  .slide:nth-of-type(12).active .risk:nth-child(4){animation-delay:.44s}
+  .slide:nth-of-type(12).active .risk.warn{animation-name:cardLift, shimmerBorder;animation-duration:.45s, 1.1s;animation-delay:var(--d, .14s), .9s;animation-fill-mode:forwards, both}
+  .slide:nth-of-type(12).active .risk.warn:nth-child(1){--d:.14s}
+  .slide:nth-of-type(12).active .risk.warn:nth-child(2){--d:.24s}
+
+  .slide:nth-of-type(13).active .footer-line i{transform-origin:left center;animation:expandLine .35s ease-out forwards;opacity:0}
+  .slide:nth-of-type(13).active .footer-line i:nth-child(1){animation-delay:.45s}
+  .slide:nth-of-type(13).active .footer-line i:nth-child(2){animation-delay:.52s}
+  .slide:nth-of-type(13).active .footer-line i:nth-child(3){animation-delay:.59s}
+  .slide:nth-of-type(13).active .footer-line i:nth-child(4){animation-delay:.66s}
+
+  .pill-row{display:flex;gap:1vw;flex-wrap:wrap;margin-top:2.2vw}
+  .pill{padding:.8vw 1.15vw;border-radius:999px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);font-size:1.02vw;color:#ece6df;box-shadow:0 8px 20px rgba(0,0,0,.16)}
+
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vw;margin-top:2.8vw}
+  .card{position:relative;overflow:hidden;padding:1.45vw 1.35vw;border-radius:28px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.10);box-shadow:0 10px 22px rgba(0,0,0,.18)}
+  .card:before{content:"";position:absolute;left:1.15vw;top:1.05vw;width:2.4vw;height:.35vw;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--orange),var(--teal),var(--violet));opacity:.9}
+  .card strong{display:block;font-size:2.05vw;letter-spacing:-.04em;font-weight:760}
+  .card span{display:block;margin-top:.7vw;font-size:1vw;line-height:1.5;color:var(--muted)}
+
+  .quote{font-size:4.2vw;line-height:1.02;letter-spacing:-.08em;font-weight:780;text-align:center}
+
+  .bubble-word{display:inline-block;padding:.75vw 1.1vw;border-radius:999px;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);transform:rotate(-3deg);box-shadow:0 10px 24px rgba(0,0,0,.18)}
+
+  .flow{position:relative;height:28vw;border-radius:34px;background:rgba(255,255,255,.05);border:1.5px dashed rgba(255,255,255,.14);padding:1.2vw}
+  .node{position:absolute;min-width:8vw;padding:.9vw 1vw;border-radius:999px;border:1.5px solid rgba(242,238,231,.12);background:rgba(255,255,255,.05);text-align:center;font-weight:700;font-size:1vw;box-shadow:0 8px 16px rgba(0,0,0,.14)}
+  .core{left:50%;top:50%;transform:translate(-50%,-50%);min-width:10vw;padding:1.2vw 1.4vw;font-size:1.15vw;background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.16)}
+  .n1{left:6%;top:10%}.n2{right:6%;top:10%}.n3{left:8%;bottom:10%}.n4{right:8%;bottom:10%}
+  .link{position:absolute;height:2px;background:rgba(255,255,255,.22);transform-origin:left center}
+  .l1{left:22%;top:28%;width:25%;transform:rotate(16deg)}
+  .l2{left:54%;top:28%;width:23%;transform:rotate(-16deg)}
+  .l3{left:23%;top:67%;width:24%;transform:rotate(-16deg)}
+  .l4{left:54%;top:67%;width:23%;transform:rotate(16deg)}
+  .flow-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .flow-svg path{stroke:rgba(255,255,255,.26);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-dasharray:7 8}
+  .flow-svg circle{fill:rgba(255,255,255,.14)}
+  .proto-svg{width:100%;height:100%}
+  .tri-under{position:absolute;width:15.8vw;height:15.8vw;border-radius:46% 54% 58% 42% / 44% 46% 54% 56%;opacity:.18;filter:blur(.2px)}
+  .u1{left:13.3%;top:1.4%;background:rgba(255,122,109,.18)}
+  .u2{right:13.3%;top:1.4%;background:rgba(111,214,208,.18)}
+  .u3{left:50%;bottom:-.6%;transform:translateX(-50%);background:rgba(177,147,255,.18)}
+  .icon{display:block;font-size:1.55vw;line-height:1;margin-bottom:.42vw;opacity:.95}
+  .footer-line{display:flex;gap:.55vw;justify-content:center;align-items:center;margin-top:1.9vw}
+  .footer-line i{display:block;width:1.9vw;height:.36vw;border-radius:999px}
+
+  .triad{position:relative;height:30vw}
+  .tri-node{position:absolute;width:15vw;height:15vw;border-radius:50%;display:grid;place-items:center;text-align:center;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.12);box-shadow:0 12px 28px rgba(0,0,0,.18)}
+  .tri-node strong{font-size:2.1vw;letter-spacing:-.04em}
+  .tri-node span{display:block;margin-top:.45vw;font-size:.92vw;color:var(--muted)}
+  .t1{left:14%;top:2%}.t2{right:14%;top:2%}.t3{left:50%;bottom:0;transform:translateX(-50%)}
+  .tri-line{position:absolute;border-top:2px dashed rgba(255,255,255,.18)}
+  .tl1{left:28%;top:28%;width:44%}.tl2{left:31%;top:60%;width:22%;transform:rotate(35deg)}
+  .tl3{right:31%;top:60%;width:22%;transform:rotate(-35deg)}
+
+  .matrix{display:grid;grid-template-columns:repeat(2,1fr);gap:1.1vw;margin-top:2vw}
+  .cell{padding:1.25vw 1.3vw;border-radius:24px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.10)}
+  .cell h4{margin:0;font-size:1.36vw;letter-spacing:-.03em}
+  .cell p{margin:.75vw 0 0;font-size:1vw;line-height:1.55;color:var(--muted)}
+
+  .ladder{display:grid;gap:.95vw;margin-top:2vw}
+  .step{display:grid;grid-template-columns:3vw 1fr;gap:1vw;align-items:center;padding:1vw 1.1vw;border-radius:24px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.10)}
+  .dot{width:3vw;height:3vw;border-radius:50%;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--orange),var(--pink));color:#201b14}
+  .step strong{display:block;font-size:1.25vw;letter-spacing:-.03em}
+  .step span{display:block;margin-top:.36vw;font-size:.98vw;line-height:1.48;color:var(--muted)}
+
+  .risk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2vw;margin-top:2.4vw}
+  .risk{padding:1.25vw 1.35vw;border-radius:26px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.10)}
+  .risk.warn{background:rgba(245,217,107,.22)}
+  .risk.good{background:rgba(123,207,122,.15)}
+  .risk h4{margin:0;font-size:1.42vw}
+  .risk p{margin:.72vw 0 0;font-size:1vw;line-height:1.55;color:var(--muted)}
+
+  .illustration{position:relative;height:28vw}
+  .doodle-wrap{position:absolute;inset:0}
+  svg{width:100%;height:100%}
+
+  #counter{position:fixed;top:1.3vw;right:1.6vw;z-index:30;padding:.5vw .9vw;border-radius:999px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);font-size:.84vw;color:#cbc3d3}
+  #progressWrap{position:fixed;left:50%;bottom:1.15vw;transform:translateX(-50%);width:min(40vw,640px);height:7px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;z-index:30}
+  #progress{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--orange),var(--teal),var(--violet));transition:width .35s ease}
+  .footer-left,.footer-right{position:fixed;bottom:1.15vw;font-size:.84vw;color:rgba(242,238,231,.45);z-index:30}
+  .footer-left{left:2vw}.footer-right{right:2vw}
+  #notes{display:none;position:fixed;right:1.5vw;top:4vw;width:28vw;max-height:74vh;overflow:auto;z-index:40;padding:1.1vw;border-radius:24px;background:rgba(21,19,27,.96);border:1.5px solid rgba(255,255,255,.12);box-shadow:var(--shadow);font-size:.95vw;line-height:1.6;color:#ece6df}
+  #notes.show{display:block}
+  #notes b{color:#fff}
+</style>
+</head>
+<body>
+<div id="deck">
+
+  <section class="slide active" data-notes="开场只保留标题与署名即可，简洁进入主题。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+    <div class="center">
+      <div>
+        <h1 class="title big reveal d1">连接，而不是构建</h1>
+        <p class="lead reveal d2" style="margin-inline:auto;text-align:center;max-width:none;font-size:1.45vw">谈少民 2026/6 深圳</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="这一页制造问题感。别逐条念，讲过去两年大家都做了很多，但也慢慢被重复建设拖住。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b4"></div></div>
+    <div class="hero">
+      <div class="kicker reveal d1">过去 18 个月</div>
+      <h2 class="h2 reveal d2">我们追上了浪潮，<br>也继承了新的负担。</h2>
+      <div class="pill-row reveal d3">
+        <div class="pill">成本越来越高</div>
+        <div class="pill">体验越来越碎</div>
+        <div class="pill">节奏越来越快</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="这里用一个业务故事去讲：问题不在于有没有 AI，而在于 AI 被锁在模块中。用户真正需要的是一个连续的、跨模块的工作流。">
+    <div class="ambient"><div class="blob b2"></div><div class="blob b3"></div></div>
+    <div class="split">
+      <div class="stack">
+        <div class="kicker reveal d1">真正的阻力</div>
+        <h2 class="h2 reveal d2">不是没有 Agent，<br>而是 Agent 被困在模块里。</h2>
+        <p class="lead reveal d3">财务、供应链、协作、外部分析各有自己的 AI，但用户要的不是四个入口，而是一件事情能走完。</p>
+      </div>
+      <div class="flow reveal d3">
+        <svg class="flow-svg" viewBox="0 0 600 420" aria-hidden="true">
+          <path d="M300 210 C240 175, 185 150, 125 118"/>
+          <path d="M300 210 C360 175, 420 150, 475 118"/>
+          <path d="M300 210 C238 245, 190 278, 132 318"/>
+          <path d="M300 210 C362 245, 416 278, 468 318"/>
+          <circle cx="300" cy="210" r="5"/>
+          <circle cx="125" cy="118" r="4"/>
+          <circle cx="475" cy="118" r="4"/>
+          <circle cx="132" cy="318" r="4"/>
+          <circle cx="468" cy="318" r="4"/>
+        </svg>
+        <div class="node core">业务问题</div>
+        <div class="node n1">财务 AI</div>
+        <div class="node n2">供应链 AI</div>
+        <div class="node n3">协作 AI</div>
+        <div class="node n4">外部 AI</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="这是转折页。告诉听众：回头看，我们其实是在做两类工作——通用能力与领域能力。要把它们分开。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b3"></div></div>
+    <div class="center">
+      <div>
+        <div class="kicker reveal d1">关键拆分</div>
+        <div class="quote reveal d2">我们到底在为 AI<br>提供什么？</div>
+        <div class="pill-row" style="justify-content:center;margin-top:2.3vw">
+          <div class="bubble-word reveal d3">通用能力</div>
+          <div class="bubble-word reveal d4" style="transform:rotate(3deg)">领域能力</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="通用能力页的主旨是：连接而不是重复造轮子。企业自己的力气，要优先放在治理，而不是复制通用 AI 平台能力。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b4"></div></div>
+    <div class="hero" style="text-align:center;justify-items:center">
+      <div class="kicker reveal d1">通用能力层</div>
+      <h2 class="title reveal d2"><span class="grad">Connect</span><br>Not Rebuild</h2>
+      <p class="lead reveal d3" style="max-width:60vw;text-align:center">记忆、多 Agent、上下文管理、模型体验都在高速变化。与其持续追赶，不如连接成熟平台，把自建部分收缩到权限、审计、合规与多租户治理。</p>
+      <div class="card-grid" style="width:76vw">
+        <div class="card reveal d2"><strong>更低内耗</strong><span>减少平台重复建设与版本追赶。</span></div>
+        <div class="card reveal d3"><strong>更快演进</strong><span>主流 AI 新能力，客户更快就能享用。</span></div>
+        <div class="card reveal d4"><strong>更强一致性</strong><span>能力、上下文、协作体验更容易打通。</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="领域能力页重点讲：能力是资产，协议只是适配层。MCP、Skills、CLI、A2A 都可以变，但核心业务能力不应该重写。">
+    <div class="ambient"><div class="blob b2"></div><div class="blob b3"></div></div>
+    <div class="split">
+      <div>
+        <div class="kicker reveal d1">领域能力层</div>
+        <h2 class="h2 reveal d2">真正的资产，<br>不是协议代码。</h2>
+        <p class="lead reveal d3">订单、审批、预算、库存、会议、知识库，这些能力才是长期价值。MCP、Skills、CLI、A2A 只是连接这些能力的不同入口。</p>
+      </div>
+      <div class="illustration reveal d3">
+        <svg class="proto-svg" viewBox="0 0 600 420" aria-hidden="true">
+          <defs>
+            <linearGradient id="cardGlow" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#24212d"/>
+              <stop offset="100%" stop-color="#17151d"/>
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke="#f2eee7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="215" y="138" width="170" height="142" rx="28" fill="url(#cardGlow)" stroke="rgba(255,255,255,.22)"/>
+            <path d="M252 184h98" opacity=".82"/>
+            <path d="M252 211h72" opacity=".45"/>
+            <path d="M252 238h86" opacity=".45"/>
+            <path d="M188 165c15 10 21 16 27 26" stroke-dasharray="8 8" opacity=".6"/>
+            <path d="M385 165c18 -9 28 -16 39 -27" stroke-dasharray="8 8" opacity=".6"/>
+            <path d="M191 278c14-8 23-15 29-24" stroke-dasharray="8 8" opacity=".6"/>
+            <path d="M383 258c18 9 28 17 39 29" stroke-dasharray="8 8" opacity=".6"/>
+          </g>
+          <g>
+            <rect x="72" y="100" width="108" height="48" rx="24" fill="#ff7a6d" opacity=".96"/>
+            <rect x="418" y="97" width="118" height="48" rx="24" fill="#6fd6d0" opacity=".96"/>
+            <rect x="78" y="282" width="94" height="48" rx="24" fill="#ffbf58" opacity=".98"/>
+            <rect x="420" y="280" width="96" height="48" rx="24" fill="#b193ff" opacity=".98"/>
+          </g>
+          <g font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="21" font-weight="800" fill="#17151d">
+            <text x="103" y="130">MCP</text>
+            <text x="449" y="128">Skills</text>
+            <text x="109" y="313">CLI</text>
+            <text x="453" y="311">A2A</text>
+          </g>
+          <g font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fill="#f2eee7">
+            <text x="247" y="175" font-size="24" font-weight="800">核心能力</text>
+            <text x="245" y="262" font-size="18" font-weight="600" fill="#b4acbf">Business Assets</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="开始讲方案，用三个词让听众先记住框架：感知、技能、行动。先建立心智模型，再逐页展开。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b4"></div></div>
+    <div class="hero">
+      <div class="kicker reveal d1">AI 进入企业软件的三道门</div>
+      <div class="triad reveal d2">
+        <div class="tri-under u1"></div><div class="tri-under u2"></div><div class="tri-under u3"></div>
+        <div class="tri-line tl1"></div><div class="tri-line tl2"></div><div class="tri-line tl3"></div>
+        <div class="tri-node t1"><div><span class="icon">◉</span><strong>感知</strong><span>Perception</span></div></div>
+        <div class="tri-node t2"><div><span class="icon">≈</span><strong>技能</strong><span>Skills</span></div></div>
+        <div class="tri-node t3"><div><span class="icon">✦</span><strong>行动</strong><span>Actions</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="感知页强调‘当前’。没有当前聊天、当前页面、当前用户、当前项目，AI 只能得到一堆静态资料，无法真正理解场景。">
+    <div class="ambient"><div class="blob b2"></div><div class="blob b3"></div></div>
+    <div class="split">
+      <div>
+        <div class="kicker reveal d1">01 · 感知</div>
+        <h2 class="h2 reveal d2">AI 先要知道：<br>我现在 <span class="grad">在哪里</span>？</h2>
+        <p class="lead reveal d3">模块、知识库、权限都重要，但更关键的是“当前”信息：当前聊天、当前项目、当前页面、当前用户。</p>
+      </div>
+      <div class="matrix reveal d3">
+        <div class="cell"><h4>Resources</h4><p>把环境和状态暴露给 AI 主机。</p></div>
+        <div class="cell"><h4>Instructions</h4><p>让系统介绍自己的边界与规则。</p></div>
+        <div class="cell"><h4>Current Context</h4><p>让“当前”随用户行为实时切换。</p></div>
+        <div class="cell"><h4>Read Tools</h4><p>把资源转成 AI 可以直接阅读的信息。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="技能页的主旨是：技能不是接口说明书，而是业务流程知识。可以举采购订单或月末结账的例子。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b2"></div></div>
+    <div class="split">
+      <div class="ladder reveal d2">
+        <div class="step"><div class="dot">1</div><div><strong>识别目标</strong><span>不是调用一个接口，而是完成一件业务上的事。</span></div></div>
+        <div class="step"><div class="dot">2</div><div><strong>编排步骤</strong><span>校验、填充、审批、通知，形成标准流程。</span></div></div>
+        <div class="step"><div class="dot">3</div><div><strong>写入约束</strong><span>把不能做的事提前告诉 AI，而不是等报错。</span></div></div>
+      </div>
+      <div>
+        <div class="kicker reveal d1">02 · 技能</div>
+        <h2 class="h2 reveal d2">工具会做事。<br><span class="grad">技能懂业务。</span></h2>
+        <p class="lead reveal d3">Skill 让 AI 站在正确的抽象层级上思考，而不是从底层工具开始猜每一步。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="行动页要强调治理：副作用、幂等、审批、预览确认。选一两个高风险动作举例即可。">
+    <div class="ambient"><div class="blob b3"></div><div class="blob b4"></div></div>
+    <div class="hero" style="text-align:center;justify-items:center">
+      <div class="kicker reveal d1">03 · 行动</div>
+      <h2 class="h2 reveal d2">最后一步，才是<br><span class="grad">改变系统</span>。</h2>
+      <div class="card-grid" style="width:84vw;grid-template-columns:repeat(4,1fr)">
+        <div class="card reveal d1"><strong>副作用</strong><span>让 AI 明确知道哪些操作会真实改动系统。</span></div>
+        <div class="card reveal d2"><strong>幂等性</strong><span>避免因重试而重复提交、重复扣减。</span></div>
+        <div class="card reveal d3"><strong>审批流</strong><span>高风险或超阈值操作进入待审批状态。</span></div>
+        <div class="card reveal d4"><strong>预览确认</strong><span>高风险动作先展示影响，再真正执行。</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="实施路径页不要念清单，要讲成一条务实路线：先识别能力，再做能力模型，找一个 AI 平台跑通，再逐步迁移。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b4"></div></div>
+    <div class="split">
+      <div>
+        <div class="kicker reveal d1">实施路径</div>
+        <h2 class="h2 reveal d2">不要一次重构世界，<br>先连接一个闭环。</h2>
+        <p class="lead reveal d3">只要一个真实业务场景先跑通，后面的治理、迁移和标准化就有了现实牵引力。</p>
+      </div>
+      <div class="ladder reveal d2">
+        <div class="step"><div class="dot">A</div><div><strong>识别核心能力</strong><span>把感知、技能、行动先拆清楚。</span></div></div>
+        <div class="step"><div class="dot">B</div><div><strong>建立能力模型</strong><span>让业务核心与协议适配分离。</span></div></div>
+        <div class="step"><div class="dot">C</div><div><strong>验证一个平台</strong><span>先让一个主流 AI 完成端到端任务。</span></div></div>
+        <div class="step"><div class="dot">D</div><div><strong>沉淀治理基线</strong><span>认证、授权、审计、脱敏与多租户。</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="这一页主动讲风险，会显得更稳重。重点是：即使标准会变，也不影响我们的核心方向，因为我们让协议层保持轻薄。">
+    <div class="ambient"><div class="blob b2"></div><div class="blob b3"></div></div>
+    <div class="hero">
+      <div class="kicker reveal d1">已知风险</div>
+      <h2 class="h2 reveal d2">标准会变，<br>架构不要被标准绑架。</h2>
+      <div class="risk-grid reveal d3" style="width:82vw">
+        <div class="risk warn"><h4>MCP 的提示词压力</h4><p>当连接很多 Server 时，工具描述可能侵占上下文窗口。</p></div>
+        <div class="risk warn"><h4>A2A 仍在早期</h4><p>跨 Agent 协作方向成立，但生态还不稳定。</p></div>
+        <div class="risk good"><h4>我们的应对</h4><p>保持能力模型稳定，让协议层保持轻薄且可替换。</p></div>
+        <div class="risk good"><h4>核心原则</h4><p>能力是资产，协议只是入口。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-notes="收尾页一句话结束：下一代企业 AI 不是一个入口，而是一组可连接的能力。停顿一下，再结束。">
+    <div class="ambient"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+    <div class="center">
+      <div>
+        <div class="kicker reveal d1">最终判断</div>
+        <h1 class="title reveal d2" style="font-size:5vw">下一代企业 AI，<br>不是一个入口，<br><span class="grad">而是一组可连接的能力。</span></h1>
+        <p class="lead reveal d3" style="margin-inline:auto;text-align:center;max-width:62vw">把通用能力交给快速演进的平台，把领域能力沉淀成开放标准下的资产，企业软件才能真正跟上 AI 的速度。</p>
+        <div class="footer-line reveal d4"><i style="background:var(--red)"></i><i style="background:var(--orange)"></i><i style="background:var(--teal)"></i><i style="background:var(--violet)"></i></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="counter"></div>
+<div id="progressWrap"><div id="progress"></div></div>
+<div class="footer-left">← / → 翻页</div>
+<div class="footer-right">S 显示讲稿提示</div>
+<div id="notes"></div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let idx=0;
+const progress=document.getElementById('progress');
+const counter=document.getElementById('counter');
+const notes=document.getElementById('notes');
+function refreshReveals(slide){slide.querySelectorAll('.reveal').forEach(el=>{el.style.animation='none';void el.offsetWidth;el.style.animation='';});}
+function show(i){idx=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,n)=>s.classList.toggle('active',n===idx));refreshReveals(slides[idx]);progress.style.width=((idx+1)/slides.length*100)+'%';counter.textContent=(idx+1)+' / '+slides.length;notes.innerHTML='<b>讲稿提示</b><br>'+slides[idx].dataset.notes;}
+window.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(idx+1)} if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(idx-1)} if(e.key.toLowerCase()==='s'){notes.classList.toggle('show')}});
+window.addEventListener('click',e=>{if(e.target.closest('#notes')) return; show(idx+1)});
+show(0);
+</script>
+</body>
+</html>

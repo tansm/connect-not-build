@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>连接，而不是构建 - AI Strategy 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;600;900&display=swap');
+        
+        :root {
+            --accent: #007AFF;
+            --bg: #000;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        /* 极客感网格背景 */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, #111 1px, transparent 1px),
+                linear-gradient(to bottom, #111 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 2;
+        }
+
+        .text-gradient {
+            background: linear-gradient(180deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .eyebrow {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .giant-text {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+        }
+
+        .sub-text {
+            color: #86868b;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            margin-top: 2rem;
+            font-weight: 300;
+            max-width: 800px;
+        }
+
+        .mcp-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            filter: blur(150px);
+            opacity: 0.2;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* 进度条 */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            display: flex;
+            z-index: 100;
+        }
+        .progress-bar {
+            flex: 1;
+            background: #1d1d1f;
+            margin: 0 2px;
+            transition: background 0.3s;
+        }
+        .progress-bar.filled {
+            background: var(--accent);
+        }
+
+        /* 底部信息 */
+        .footer {
+            position: fixed;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 0.2em;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body onclick="nextSlide()">
+
+    <div class="grid-overlay"></div>
+    <div class="progress-container" id="progress"></div>
+
+    <!-- Slide 1: 标题 -->
+    <div class="slide active" id="slide-0">
+        <div class="eyebrow">2024 — 2025 RECAP</div>
+        <h1 class="giant-text text-gradient">繁荣背后的泥潭</h1>
+        <p class="sub-text">谈少民 2026/6 深圳</p>
+    </div>
+
+    <!-- Slide 2: 悬念问句 -->
+    <div class="slide" id="slide-1">
+        <h1 class="giant-text">为什么</h1>
+        <h1 class="giant-text text-blue-500 italic">越努力，AI 越难用？</h1>
+    </div>
+
+    <!-- Slide 3: 核心战略转型 -->
+    <div class="slide" id="slide-2">
+        <h1 style="font-size: 12vw;" class="giant-text">CONNECT</h1>
+        <div style="height: 2px; width: 100px; background: var(--accent); margin: 40px 0;"></div>
+        <h1 style="color: #444;" class="giant-text">NOT BUILD</h1>
+    </div>
+
+    <!-- Slide 4: 通用能力的真相 -->
+    <div class="slide" id="slide-3">
+        <div class="eyebrow">通用能力层</div>
+        <h1 class="text-4xl md:text-6xl font-bold">不再追赶，而是<span class="text-blue-500">直接享受</span>。</h1>
+        <p class="sub-text">记忆、多Agent协作、安全审计……<br>这些不再是你的负担。</p>
+    </div>
+
+    <!-- Slide 5: MCP 亮相 -->
+    <div class="slide" id="slide-4">
+        <div class="mcp-glow"></div>
+        <h1 class="giant-text italic">MCP</h1>
+        <p class="text-blue-400 font-mono tracking-widest mt-4">Model Context Protocol</p>
+        <p class="sub-text">让你的软件，成为 AI 的原生器官。</p>
+    </div>
+
+    <!-- Slide 6: 感知 -->
+    <div class="slide" id="slide-5">
+        <div class="eyebrow">感知 / PERCEPTION</div>
+        <h1 class="text-6xl font-black mb-8">看清，才能思考</h1>
+        <p class="sub-text">不仅仅是数据，而是环境、用户和当前的瞬间。</p>
+    </div>
+
+    <!-- Slide 7: 技能 -->
+    <div class="slide" id="slide-6">
+        <div class="eyebrow">技能 / SKILLS</div>
+        <h1 class="text-6xl font-black mb-8">不止是 API</h1>
+        <p class="sub-text">技能是知识的编排。是“如何正确地完成任务”。</p>
+    </div>
+
+    <!-- Slide 8: 行动 -->
+    <div class="slide" id="slide-7">
+        <div class="eyebrow">行动 / ACTION</div>
+        <h1 class="text-6xl font-black mb-8">有边界的权力</h1>
+        <p class="sub-text">幂等、可审计、受控。拿起电钻前，AI 必须懂规矩。</p>
+    </div>
+
+    <!-- Slide 9: 架构思想 -->
+    <div class="slide" id="slide-8">
+        <h1 class="text-7xl font-bold mb-10">能力是资产</h1>
+        <div class="text-blue-500 text-3xl font-light tracking-[1em] mb-10">———适配———</div>
+        <h1 class="text-7xl font-bold text-zinc-700">协议是适配层</h1>
+    </div>
+
+    <!-- Slide 10: 结语 -->
+    <div class="slide" id="slide-9">
+        <h1 class="giant-text">Don't Build an Island.</h1>
+        <h1 class="giant-text text-blue-500">Build a Bridge.</h1>
+    </div>
+
+    <div class="footer">
+        <div>THE LINKAGE // STRATEGY 2026</div>
+        <div>STRICTLY CONFIDENTIAL</div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progressContainer = document.getElementById('progress');
+
+        // 初始化进度条
+        slides.forEach((_, i) => {
+            const bar = document.createElement('div');
+            bar.className = 'progress-bar' + (i === 0 ? ' filled' : '');
+            progressContainer.appendChild(bar);
+        });
+
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            slides[index].classList.add('active');
+            
+            const bars = document.querySelectorAll('.progress-bar');
+            bars.forEach((bar, i) => {
+                if (i <= index) bar.classList.add('filled');
+                else bar.classList.remove('filled');
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+    </script>
+</body>
+</html>
